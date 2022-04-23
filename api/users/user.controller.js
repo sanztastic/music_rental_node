@@ -7,7 +7,8 @@ const {
     getUserByEmail,
     setVerificationCode,
     getVerificationCode,
-    updateUserById
+    updateUserById,
+    forgotPassword
 } = require("./user.service");
 
 //encrypting the password in the database
@@ -264,5 +265,18 @@ module.exports = {
                 message: "Wrong verification code"
             });
         });
-    }
+    },
+    // passwordForgot: (req,res)=>{
+    //     const data = req.body;
+    //     forgotPassword(data,(error,result)=>{
+    //         if(error){
+    //             res.status(200).json({
+    //                 status:1,
+    //                 message: "Wrong request may be the email does not exist in our system."
+    //             });
+    //         }
+    //         var password = result.password;
+
+    //     });
+    // }
 }

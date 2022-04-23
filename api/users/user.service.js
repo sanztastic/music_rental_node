@@ -99,5 +99,16 @@ module.exports = {
             }
             return callBack(null,results[0]);
         });
+    },
+    forgotPassword: (data, callBack)=>{
+        pool.query(`select password from customer where email = ?`,
+        [data.email],
+        (error,results,fields)=>{
+            if(error){
+                return callBack(error);
+            }
+            return callBack(null,results[0]);
+        }
+        );
     }
 };  
