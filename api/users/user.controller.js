@@ -7,7 +7,8 @@ const {
     getUserByEmail,
     setVerificationCode,
     getVerificationCode,
-    updateUserById
+    updateUserById,
+    forgotPassword
 } = require("./user.service");
 
 //encrypting the password in the database
@@ -20,35 +21,36 @@ const nodemailer = require("nodemailer");
 const { v4:uuidv4 } = require("uuid");
 
 //nodemailer stuff
-let transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth:{
-        user: process.env.AUTH_EMAIL,
-        pass: process.env.AUTH_PASS
-    }
-});
+// let transporter = nodemailer.createTransport({
+//     service: 'gmail',
+//     auth:{
+//         user: process.env.AUTH_EMAIL,
+//         pass: process.env.AUTH_PASS
+//     }
+// });
 
-//testing success
-transporter.verify((error, success)=>{
-    if(error){
-        console.log(error);
-    }else{
-        console.log("Ready for messages");
-        console.log(success);
-    }
+// //testing success
+// transporter.verify((error, success)=>{
+//     if(error){
+//         console.log(error);
+//     }else{
+//         console.log("Ready for messages");
+//         console.log(success);
+//     }
 
-});
+// });
 
 
 module.exports = {
     createUser: (req,res)=>{
+        
         const body = req.body;
         const salt = genSaltSync(10);
         body.password = hashSync(body.password, salt);
         getUserByEmail(body,(err,results)=>{
             if(err){
                 console.log(err);
-                return res.status(500).json({
+                return res.status(200).json({
                     success: 0,
                     message: "database connection error" 
                 });
@@ -189,6 +191,7 @@ module.exports = {
         });
     },
     login: (req,res)=>{
+        console.log(req.body);
         const body = req.body;
         getUserByEmail(body, (err,results)=>{
             if(err){
@@ -208,7 +211,9 @@ module.exports = {
                 });
                 return res.json({
                     success: 1,
-                    token: jsonToken
+                    customer_id: results[0].id,
+                    token: jsonToken,
+                    user: results[0]
                 });
             }else{
                 return res.json({
@@ -260,5 +265,18 @@ module.exports = {
                 message: "Wrong verification code"
             });
         });
-    }
+    },
+    // passwordForgot: (req,res)=>{
+    //     const data = req.body;
+    //     forgotPassword(data,(error,result)=>{
+    //         if(error){
+    //             res.status(200).json({
+    //                 status:1,
+    //                 message: "Wrong request may be the email does not exist in our system."
+    //             });
+    //         }
+    //         var password = result.password;
+
+    //     });
+    // }
 }

@@ -2,6 +2,7 @@ const pool = require("../../config/database");
 
 module.exports = {
     create: (data, callBack)=>{
+        console.log(data);
         pool.query(`insert into customer (name, address, number, password, email) values (?, ?, ?, ?, ?)`,
                     [
                         data.name,
@@ -98,5 +99,16 @@ module.exports = {
             }
             return callBack(null,results[0]);
         });
+    },
+    forgotPassword: (data, callBack)=>{
+        pool.query(`select password from customer where email = ?`,
+        [data.email],
+        (error,results,fields)=>{
+            if(error){
+                return callBack(error);
+            }
+            return callBack(null,results[0]);
+        }
+        );
     }
 };  

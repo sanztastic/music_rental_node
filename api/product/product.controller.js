@@ -17,7 +17,7 @@ module.exports = {
                 message: "no file uploaded"
             });
         } else {
-            var imgsrc = 'http://localhost:3000/images/' + req.file.filename
+            var imgsrc = '/images/' + req.file.filename
             body["imageK"] = imgsrc;
             create(body,(err,results)=>{
                 if(err){
@@ -35,6 +35,7 @@ module.exports = {
         }
     },
     getProducts: (req,res)=>{
+        console.log(req);
         getAllProduct((err,results)=>{
             if(err){
                 console.log(err);
@@ -47,9 +48,9 @@ module.exports = {
         });
     },
     updateProduct: (req,res)=>{
-        const body = req.body;
-        const salt = genSaltSync(10);
-        body.password = hashSync(body.password, salt);
+        // const body = req.body;
+        // const salt = genSaltSync(10);
+        // body.password = hashSync(body.password, salt);
         updateProduct(body,(err,results)=>{
             if(err){
                 console.log(err);
@@ -64,6 +65,8 @@ module.exports = {
     deleteProduct: (req,res)=>{
         const data = req.body;
         deleteProduct(data, (err,results)=>{
+            console.log("error",err);
+            console.log("results",results);
             if(err){
                 console.log(err);
                 return;
@@ -71,7 +74,7 @@ module.exports = {
             if(!results){
                 return res.json({
                     success: 0,
-                    message: "Product deleted successfully"
+                    message: "Product deleted failed"
                 });
             }
             return res.json({
