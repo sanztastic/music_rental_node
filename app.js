@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const cors = require('cors');
 const app = express();
 const userRouter = require("./api/users/user.router");
 const adminRouter = require("./api/admin/admin.router");
@@ -11,6 +12,7 @@ const bodyparser = require('body-parser');
 const { json } = require("express/lib/response");
 
 app.use(express.json());
+app.use(cors());
 // body-parser middleware use
 app.use(bodyparser.json())
 //use express static folder

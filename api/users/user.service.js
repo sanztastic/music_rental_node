@@ -110,5 +110,15 @@ module.exports = {
             return callBack(null,results[0]);
         }
         );
+    },
+    updatePassword: (data, password ,callBack)=>{
+        pool.query("update customer set password = ? where email=?",
+        [password,data.email],
+        (error,results,fields)=>{
+            if(error){
+                return callBack(error);
+            }
+            return callBack(null,results[0])
+        })
     }
 };  

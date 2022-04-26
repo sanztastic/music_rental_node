@@ -8,7 +8,7 @@ const {
     setVerificationCode,
     getVerificationCode,
     updateUserById,
-    forgotPassword
+    updatePassword
 } = require("./user.service");
 
 //encrypting the password in the database
@@ -20,25 +20,25 @@ const nodemailer = require("nodemailer");
 //unique string for generating the code that is going to be sent to the email for verification
 const { v4:uuidv4 } = require("uuid");
 
-//nodemailer stuff
-// let transporter = nodemailer.createTransport({
-//     service: 'gmail',
-//     auth:{
-//         user: process.env.AUTH_EMAIL,
-//         pass: process.env.AUTH_PASS
-//     }
-// });
+// nodemailer stuff
+let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth:{
+        user: process.env.AUTH_EMAIL,
+        pass: process.env.AUTH_PASS
+    }
+});
 
-// //testing success
-// transporter.verify((error, success)=>{
-//     if(error){
-//         console.log(error);
-//     }else{
-//         console.log("Ready for messages");
-//         console.log(success);
-//     }
+//testing success
+transporter.verify((error, success)=>{
+    if(error){
+        console.log(error);
+    }else{
+        console.log("Ready for messages");
+        console.log(success);
+    }
 
-// });
+});
 
 
 module.exports = {
@@ -236,6 +236,46 @@ module.exports = {
                 status: 1,
                 message: "success"
             });
+        });
+    },
+    setDefaultPassword: (req,res)=>{
+        const salt = genSaltSync(10);
+        const password = "newpassword";
+        const bodyPass = hashSync(password, salt);
+        updatePassword(req.body,bodyPass,(error,result)=>{
+            if(error) {
+                console.log(error);
+                return res.status(200).json({
+                    status: 0,
+                    message: "There was some problem"
+                }); 
+            }
+                    const { to,subject,message }={
+                        to: req.body.email,
+                        subject: "New Password Reset",
+                        message: "Your new password is "+password +" Please use these password to login to your account and you can change the password after logging in under User Profile Section."
+                    }
+        
+                    const mailOptions={
+                        from: process.env.AUTH_EMAIL,
+                        to: to,
+                        subject: subject,
+                        text: message
+                    };
+                    transporter.sendMail(mailOptions)
+                               .then(()=>{   
+                                    return res.status(200).json({
+                                        success: 1,
+                                        message: "Your new password has been sent to your email!",
+                                        data: datas
+                                    });
+                                })
+                               .catch((error)=>{
+                                    return res.status(200).json({
+                                        success: 0,
+                                        message: "An error has occured"
+                                    });
+                                });
         });
     },
     checkVerification: (req,res)=>{
